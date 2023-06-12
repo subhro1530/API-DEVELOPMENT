@@ -332,6 +332,7 @@ def create_posts(post:Post):
 ```
 
 ### POST Request
+
 ```JSON
 {
     "data": {
@@ -343,7 +344,9 @@ def create_posts(post:Post):
     }
 }
 ```
+
 ### GET Request
+
 ```JSON
 {
     "data": [
@@ -372,5 +375,81 @@ def create_posts(post:Post):
             "id": 56611228
         }
     ]
+}
+```
+
+3.  Retrieving one indivitual post:
+
+```python
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id):
+    print(id)
+    return {"post detail":f"Here is post {id}"}
+```
+
+### GET method
+
+```
+http://127.0.0.1:8000/posts/2
+```
+
+```JSON
+{
+    "post detail": "Here is post 2"
+}
+```
+
+4. Searching through the id's
+
+```python
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id):
+    post=find_post(id)
+    return {"post detail":post}
+```
+
+```JSON
+{
+    "post detail": null
+}
+```
+
+Wrong Output since the id type is int but the given id is string. This is why the search result is null.
+
+Correction:
+
+```python
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id):
+    post=find_post(int(id)) # Convert String to int
+    print(post)
+    return {"post detail":post}
+```
+
+```JSON
+{
+    "post detail": {
+        "title": "title of post 2",
+        "content": "content of post 2",
+        "id": 2
+    }
+}
+```
+
+4. To validate the id:
+
+```python
+def get_post(id:int):   # This will make sure it is always converted
+    post=find_post(id) # Now we dont need to convert
+    print(post)
+    return {"post detail":post}
+```
+```JSON
+{
+    "post detail": {
+        "title": "title of post 2",
+        "content": "content of post 2",
+        "id": 2
+    }
 }
 ```
