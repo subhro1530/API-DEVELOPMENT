@@ -268,3 +268,109 @@ def create_posts(new_post:Post):
     }
 }
 ```
+
+## Creating database and fetching from it:
+
+1.
+
+```python
+# Database 1
+my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"title":"title of post 2","content":"content of post 2","id":2}]
+
+# Database return
+@app.get("/posts")
+def get_posts():
+    return {"data":my_posts}
+```
+
+Recieved From Postman:
+
+```JSON
+{
+    "data": [
+        {
+            "title": "title of post 1",
+            "content": "content of post 1",
+            "id": 1
+        },
+        {
+            "title": "title of post 2",
+            "content": "content of post 2",
+            "id": 2
+        }
+    ]
+}
+```
+
+2. Giving a random id to the post function while anything is posted and then returning it. Also merging with the get method 'my_posts' variable. Dynamically adding to the database created :
+
+```python
+# Created Previously
+# Basemodel checks if not empty any field
+# If any field is empty it throws error
+class Post(BaseModel):
+    title:str
+    content:str
+    published:bool=True
+    rating:Optional[int]=None
+
+# Database 1
+my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"title":"title of post 2","content":"content of post 2","id":2}]
+
+# Database return
+@app.get("/posts")
+def get_posts():
+    return {"data":my_posts}
+
+@app.post("/createposts")
+def create_posts(post:Post):
+    post_dict=post.dict()
+    post_dict['id']=randrange(0,100000000)
+    my_posts.append(post_dict)
+    return{"data":post_dict}
+
+```
+
+### POST Request
+```JSON
+{
+    "data": {
+        "title": "top beaches in india",
+        "content": "Reasults of beaches are being fetched...",
+        "published": true,
+        "rating": 4,
+        "id": 17030385
+    }
+}
+```
+### GET Request
+```JSON
+{
+    "data": [
+        {
+            "title": "title of post 1",
+            "content": "content of post 1",
+            "id": 1
+        },
+        {
+            "title": "title of post 2",
+            "content": "content of post 2",
+            "id": 2
+        },
+        {
+            "title": "top beaches in india",
+            "content": "Reasults of beaches are being fetched...",
+            "published": true,
+            "rating": 4,
+            "id": 17030385
+        },
+        {
+            "title": "top beaches in india",
+            "content": "Reasults of beaches are being fetched...",
+            "published": true,
+            "rating": 4,
+            "id": 56611228
+        }
+    ]
+}
+```
