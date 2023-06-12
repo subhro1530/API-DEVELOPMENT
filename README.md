@@ -173,6 +173,7 @@ def create_posts(new_post:Post):
 ```
 
 2.  Implementing some boolean logic to check:
+
 ```python
 
 # Basemodel checks if not empty any field
@@ -194,4 +195,76 @@ def create_posts(new_post:Post):
 INFO:     Application startup complete.
 True
 INFO:     127.0.0.1:51110 - "POST /createposts HTTP/1.1" 200 OK
+```
+
+3.  Implement an optional field
+
+```python
+from typing import Optional
+
+# Basemodel checks if not empty any field
+# If any field is empty it throws error
+class Post(BaseModel):
+    title:str
+    content:str
+    published:bool=True
+    rating:Optional[int]=None
+
+```
+
+```bash
+INFO:     Application startup complete.
+None
+INFO:     127.0.0.1:51201 - "POST /createposts HTTP/1.1" 200 OK
+```
+
+4.  Printing the rating after changing it in postman:
+
+```python
+@app.post("/createposts")
+def create_posts(new_post:Post):
+    print(new_post)
+    print(new_post.rating)
+    return {"data":"new post"}
+```
+
+```bash
+INFO:     127.0.0.1:51201 - "POST /createposts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51228 - "POST /createposts HTTP/1.1" 422 Unprocessable Entity
+4
+INFO:     127.0.0.1:51252 - "POST /createposts HTTP/1.1" 200 OK
+```
+
+5.  On printing the new_post as .dict() method converts the post into a dictionary.
+
+```python
+@app.post("/createposts")
+def create_posts(new_post:Post):
+    print(new_post.dict())
+    return {"data":"new post"}
+
+```
+
+```bash
+{'title': 'top beaches in india', 'content': 'Reasults of beaches are being fetched...', 'published': True, 'rating': 4}
+```
+
+6. Sending the new post to postman by returning it:
+
+```python
+@app.post("/createposts")
+def create_posts(new_post:Post):
+    print(new_post.dict())
+    return {"data":new_post}    #ending back the dictionary
+```
+
+```JSON
+{
+    "data": {
+        "title": "top beaches in india",
+        "content": "Reasults of beaches are being fetched...",
+        "published": true,
+        "rating": 4
+    }
+}
 ```
