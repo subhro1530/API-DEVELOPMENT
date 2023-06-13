@@ -1,6 +1,6 @@
 from random import randrange
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI,Response, status,HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
 
@@ -43,12 +43,18 @@ async def root():
 #     return {"data":new_post}    #ending back the dictionary
 
 
+# New posts
+my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"title":"title of post 2","content":"content of post 2","id":2}]
+
+
 # Database return
 @app.get("/posts")
 def get_posts():
     return {"data":my_posts}
 
-@app.post("/createposts")
+
+
+@app.post("/createposts",status_code=status.HTTP_201_CREATED)
 def create_posts(post:Post):
     post_dict=post.dict()
     post_dict['id']=randrange(0,100000000)
@@ -59,9 +65,36 @@ def find_post(id):
     for p in my_posts:
         if p['id']==id:
             return p
+        
+# @app.get("/posts/latest")
+# def get_latest_post():
+#     post=my_posts[len(my_posts)-1]
+#     return{"Latest Post":post}
     
 @app.get("/posts/{id}")     # This id is path parameter
 def get_post(id:int):
     post=find_post(id) # Convert String to int
-    print(post)
+    if not post:    # If post contains a null value
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id : {id} was not found.")
     return {"post detail":post}
+
+
+
+# Deleting Posts
+def find_index_post(id):
+    for i, p in enumerate(my_posts):
+        if p['id']==id:
+            return i
+
+
+@app.delete("/posts/{id}")
+def delete_post():
+    #   deleting post
+    #   find the index in the array that has required ID
+    #   my_posts.pop(index)
+    index=find_index_post(id)
+
+    my_posts.pop(index)
+    return {"message":"Post was successfully deleted."}
+
+

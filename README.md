@@ -27,6 +27,12 @@ python -m venv <name>
 pip install "fastapi[all]"
 ```
 
+Start the process(host):
+
+```bash
+uvicorn main:app --reload
+```
+
 ## GET Request
 
 6.  Test the execution of the code
@@ -444,6 +450,7 @@ def get_post(id:int):   # This will make sure it is always converted
     print(post)
     return {"post detail":post}
 ```
+
 ```JSON
 {
     "post detail": {
@@ -452,4 +459,116 @@ def get_post(id:int):   # This will make sure it is always converted
         "id": 2
     }
 }
+```
+
+5. To know that order of writing code maatters :
+
+```python
+#This code will throw an error while get request since the id parameter would be instantiated with 'latest' and it will be a type mismatch...
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int):
+    post=find_post(id) # Convert String to int
+    print(post)
+    return {"post detail":post}
+
+
+@app.get("/posts/latest")
+def get_latest_post():
+    post=my_posts[len(my_posts)-1]
+    return{"Latest Post":post}
+```
+
+Correction:
+
+```python
+#This is how order o execution matters and this code will execute the /latest first and the /{id} later throwing no error.
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int):
+    post=find_post(id) # Convert String to int
+    print(post)
+    return {"post detail":post}
+
+
+@app.get("/posts/latest")
+def get_latest_post():
+    post=my_posts[len(my_posts)-1]
+    return{"Latest Post":post}
+```
+
+6.  To manipulate the error response code i.e to return 404 error if not found:
+
+```python
+
+from fastapi import FastAPI,Response    # Response added
+
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int,response:Response):
+    post=find_post(id) # Convert String to int
+    if not post:    # If post contains a null value
+        response.status_code=404
+    print(post)
+    return {"post detail":post}
+```
+
+Also another way:
+
+```python
+from fastapi import FastAPI,Response, status
+
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int,response:Response):
+    post=find_post(id) # Convert String to int
+    if not post:    # If post contains a null value
+        response.status_code=status.HTTP_404_NOT_FOUND
+        return {'message':f"post with {id} was not found."}
+    print(post)
+    return {"post detail":post}
+
+```
+
+In one line:
+
+```python
+from fastapi import FastAPI,Response, status,HTTPException
+
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int):
+    post=find_post(id) # Convert String to int
+    if not post:    # If post contains a null value
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with {id} was not found.")
+    return {"post detail":post}
+```
+
+7.  To manipulate the post >> 201_Created
+
+```python
+@app.post("/createposts",status_code=status.HTTP_201_CREATED)
+def create_posts(post:Post):
+    post_dict=post.dict()
+    post_dict['id']=randrange(0,100000000)
+    my_posts.append(post_dict)
+    return{"data":post_dict}
+```
+
+### Deleting Posts
+
+1.
+
+```python
+# Deleting Posts
+def find_index_post(id):
+    for i, p in enumerate(my_posts):
+        if p['id']==id:
+            return i
+
+
+@app.delete("/posts/{id}")
+def delete_post():
+    #   deleting post
+    #   find the index in the array that has required ID
+    #   my_posts.pop(index)
+    index=find_index_post(id)
+
+    my_posts.pop(index)
+    return {"message":"Post was successfully deleted."}
 ```
