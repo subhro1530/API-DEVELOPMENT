@@ -552,7 +552,7 @@ def create_posts(post:Post):
 
 ### Deleting Posts
 
-1.
+1.  Deleting posts:
 
 ```python
 # Deleting Posts
@@ -563,7 +563,7 @@ def find_index_post(id):
 
 
 @app.delete("/posts/{id}")
-def delete_post():
+def delete_post(id:int):
     #   deleting post
     #   find the index in the array that has required ID
     #   my_posts.pop(index)
@@ -571,4 +571,21 @@ def delete_post():
 
     my_posts.pop(index)
     return {"message":"Post was successfully deleted."}
+```
+
+2. Another way with HTTPException:
+
+```python
+@app.delete("/posts/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id:int):
+    #   deleting post
+    #   find the index in the array that has required ID
+    #   my_posts.pop(index)
+    index=find_index_post(id)
+
+    if index==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,details=f"post with id:{id} doesnot exist.")
+
+    my_posts.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 ```
