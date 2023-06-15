@@ -2,6 +2,8 @@
 
 ## FastAPI
 
+> [Documentation](https://fastapi.tiangolo.com/tutorial/first-steps/)
+
 ## Steps to be followed.
 
 1.  Check for python version
@@ -588,4 +590,90 @@ def delete_post(id:int):
 
     my_posts.pop(index)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+```
+
+### Update post
+
+1.  Creating the layout:
+
+```python
+
+class Post(BaseModel):
+    title:str
+    content:str
+    published:bool=True
+    rating:Optional[int]=None
+
+@app.put("/posts/{id}")
+def update_post(id:int,post:Post):
+    index=find_index_post(id)
+
+    if index==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,details=f"post with id:{id} doesnot exist.")
+
+    post_dict=post.dict()
+    post_dict['id']=id
+    my_posts[index]=post_dict
+
+
+    return {'data':post_dict}
+
+```
+
+2.  Slight change from the docs:
+
+> Create a folder known as app
+> Create a **init**.py file
+> Inside this file:
+
+```python
+
+```
+
+```bash
+(VirtualEnv) D:\Desktop\API DEVELOPMENT>cd app
+
+(VirtualEnv) D:\Desktop\API DEVELOPMENT\app>uvicorn main:app --reload
+INFO:     Will watch for changes in these directories: ['D:\\Desktop\\API DEVELOPMENT\\app']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [26020] using WatchFiles
+INFO:     Started server process [35312]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+
+```
+
+### To create the database and other installs:
+
+[Start : 2:44:00](https://youtu.be/0sOvCWFmrtA?t=9876)
+
+### Some Queries in SQl
+
+```SQL
+
+SELECT * from products;
+```
+
+```SQL
+SELECT * from products WHERE is_sale=True;
+```
+
+```SQL
+SELECT id,price from products where is_sale=True;
+```
+
+```SQL
+SELECT * from products where price>=50;
+```
+
+```SQL
+SELECT * from products where is_sale!=False;
+```
+
+```SQL
+SELECT * from products where id>2 AND inventory>=6 AND price >=50;
+
+```
+```SQL
+SELECT * from products WHERE name LIKE 'TV%';
 ```
