@@ -731,3 +731,94 @@ SELECT * FROM products;
 UPDATE products SET is_sale=true WHERE id>100;
 SELECT * FROM products;
 ```
+
+## Installing and working with psycopg2, a link between python and the database
+
+```bash
+(VirtualEnv) D:\Desktop\API DEVELOPMENT>pip install psycopg2-binary
+Collecting psycopg2-binary
+  Downloading psycopg2_binary-2.9.6-cp310-cp310-win_amd64.whl (1.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 186.1 kB/s eta 0:00:00
+Installing collected packages: psycopg2-binary
+Successfully installed psycopg2-binary-2.9.6
+```
+
+Code to establish the connection:
+
+```python
+import psycopg2
+
+#   Establishing Connection
+try:
+    conn=psycopg2.connect(host='localhost',database='fastapi',user='postgres',password='*********',cursor_factory=RealDictCursor)
+    cursor=conn.cursor()
+    print("Database connection was successful.")
+except Exception as error:
+    print("Connecting to the database failed.")
+    print("Error: ",error)
+```
+
+Code to continue the connection calls till it is successful:
+
+```python
+#   Establishing Connection
+while True:
+    try:
+        conn=psycopg2.connect(host='localhost',database='fastapi',user='postgres',password='********',cursor_factory=RealDictCursor)
+        cursor=conn.cursor()
+        print("Database connection was successful.")
+        break
+    except Exception as error:
+        print("Connecting to the database failed.")
+        print("Error: ",error)
+        sleep(2)
+```
+
+## Creating new HTTPRequests with SQL Queries
+
+```python
+
+# Database return
+@app.get("/posts")
+def get_posts():
+    cursor.execute("""SELECT * FROM posts""")
+    posts=cursor.fetchall()
+    print(posts)
+    return {"data":my_posts}
+
+```
+
+```bash
+Database connection was successful.
+INFO:     Started server process [26260]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+[RealDictRow([('id', 2), ('title', 'first post'), ('content', 'This is my first post.\n'), ('published', True), ('created_at', datetime.datetime(2023, 6, 16, 20, 44, 18, 918841, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800))))]), RealDictRow([('id', 3), ('title', 'second post\n'), ('content', 'This is my second post.'), ('published', False), ('created_at', datetime.datetime(2023, 6, 16, 20, 44, 18, 918841, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800))))])]
+```
+
+To Get the sql server
+
+```sql
+
+```
+
+```JSON
+{
+    "data": [
+        {
+            "id": 2,
+            "title": "first post",
+            "content": "This is my first post.\n",
+            "published": true,
+            "created_at": "2023-06-16T20:44:18.918841+05:30"
+        },
+        {
+            "id": 3,
+            "title": "second post\n",
+            "content": "This is my second post.",
+            "published": false,
+            "created_at": "2023-06-16T20:44:18.918841+05:30"
+        }
+    ]
+}
+```

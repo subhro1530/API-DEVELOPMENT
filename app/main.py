@@ -1,8 +1,11 @@
 from random import randrange
+from time import sleep
 from typing import Optional
 from fastapi import FastAPI,Response, status,HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app= FastAPI()
 
@@ -16,15 +19,27 @@ class Post(BaseModel):
     rating:Optional[int]=None
 
 
+#   Establishing Connection
+while True:
+    try:
+        conn=psycopg2.connect(host='localhost',database='fastapi',user='postgres',password='saha@2004',cursor_factory=RealDictCursor)
+        cursor=conn.cursor()
+        print("Database connection was successful.")
+        break
+    except Exception as error:
+        print("Connecting to the database failed.")
+        print("Error: ",error)
+        sleep(2)
+
 # Database 1
-my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"title":"title of post 2","content":"content of post 2","id":2}]
+# my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"title":"title of post 2","content":"content of post 2","id":2}]
 
 
 # Declaring the decorator @ Symbol
-@app.get("/")   
+# @app.get("/")   
 
-async def root():
-    return {"message":"This is my api development tutorial!!!"}
+# async def root():
+#     return {"message":"This is my api development tutorial!!!"}
 
 
 # @app.get("/posts")
@@ -50,7 +65,10 @@ my_posts=[{"title":"title of post 1","content":"content of post 1","id":1},{"tit
 # Database return
 @app.get("/posts")
 def get_posts():
-    return {"data":my_posts}
+    cursor.execute("""SELECT * FROM posts""")
+    posts=cursor.fetchall()
+    print(posts)
+    return {"data":posts}
 
 
 
