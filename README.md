@@ -649,6 +649,8 @@ INFO:     Application startup complete.
 
 ### Some Queries in SQl
 
+SELECT
+
 ```SQL
 
 SELECT * from products;
@@ -674,6 +676,58 @@ SELECT * from products where is_sale!=False;
 SELECT * from products where id>2 AND inventory>=6 AND price >=50;
 
 ```
+
 ```SQL
 SELECT * from products WHERE name LIKE 'TV%';
+```
+
+```SQL
+SELECT * from products WHERE name LIKE '%e';
+```
+
+```SQL
+SELECT * from products ORDER BY price ASC;
+```
+
+```SQL
+SELECT * from products ORDER BY price DESC;
+```
+
+```SQL
+SELECT * from products ORDER BY price DESC;
+```
+
+INSERT
+
+```SQL
+INSERT INTO products (id,price,name,inventory) VALUES (104,45,'USA',1);
+SELECT * from products WHERE name='tortilla'
+```
+
+DELETE
+
+```SQL
+DELETE FROM products WHERE id=101;
+```
+
+```SQL
+DELETE FROM products WHERE id=101;
+
+DELETE FROM products WHERE id=102 RETURNING *;
+
+DELETE FROM products WHERE inventory=0;
+SELECT * FROM products
+
+```
+
+UPDATE
+
+```SQL
+UPDATE products SET name='Flower' , price=4 WHERE id=144
+
+UPDATE products SET name='Flower' , price=4,is_sale=true WHERE id=104;
+SELECT * FROM products;
+
+UPDATE products SET is_sale=true WHERE id>100;
+SELECT * FROM products;
 ```
