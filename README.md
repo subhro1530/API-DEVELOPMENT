@@ -822,3 +822,81 @@ To Get the sql server
     ]
 }
 ```
+
+## Posting to a database:
+
+```python
+@app.post("/createposts",status_code=status.HTTP_201_CREATED)
+def create_posts(post:Post):
+    cursor.execute("""INSERT INTO posts (title,content,published) VALUES (%s,%s,%s) RETURNING * """,(post.title,post.content,post.published))
+    new_post=cursor.fetchone()
+
+    conn.commit()
+
+    return{"data":new_post}
+```
+
+Now give the data to the body of postman:
+
+```JSON
+{
+    "title":"third post (dynamic)",
+    "content":"content of third post"
+}
+```
+
+Output:
+
+```JSON
+{
+    "data": {
+        "id": 4,
+        "title": "third post (dynamic)",
+        "content": "content of third post",
+        "published": true,
+        "created_at": "2023-06-17T09:39:23.625200+05:30"
+    }
+}
+```
+
+## Getting posts with id
+
+```python
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int):
+
+    cursor.execute("""SELECT * from posts WHERE id = %s """,(str(id),))
+    post=cursor.fetchone()
+    print(str(id))
+    if not post:    # If post contains a null value
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id : {id} was not found.")
+    return {"post detail":post}
+```
+
+```JSON
+{
+    "post detail": {
+        "id": 3,
+        "title": "second post\n",
+        "content": "This is my second post.",
+        "published": false,
+        "created_at": "2023-06-16T20:44:18.918841+05:30"
+    }
+}
+```
+
+## Delete posts
+
+```python
+@app.get("/posts/{id}")     # This id is path parameter
+def get_post(id:int):
+
+    cursor.execute("""SELECT * from posts WHERE id = %s """,(str(id),))
+    post=cursor.fetchone()
+    if not post:    # If post contains a null value
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id : {id} was not found.")
+    return {"post detail":post}
+```
+
+
+##  Update Post
