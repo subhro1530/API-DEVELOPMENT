@@ -898,5 +898,29 @@ def get_post(id:int):
     return {"post detail":post}
 ```
 
+## Update Post
 
-##  Update Post
+```python
+@app.put("/posts/{id}")
+def update_post(id:int,post:Post):
+    cursor.execute("""UPDATE posts SET title=%s, content=%s WHERE id=%s RETURNING *""",(post.title,post.content,str(id)))
+    update_posts=cursor.fetchone()
+    print(update_posts)
+    conn.commit()
+
+    if update_posts==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,details=f"post with id:{id} doesnot exist.")
+    return {'data':update_posts}
+```
+
+```JSON
+{
+    "data": {
+        "id": 5,
+        "title": "post has been updated",
+        "content": "this is the updated content",
+        "published": true,
+        "created_at": "2023-06-17T09:43:16.885754+05:30"
+    }
+}
+```
